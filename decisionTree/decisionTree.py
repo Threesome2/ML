@@ -9,7 +9,7 @@
 import math
 #小的数据集
 def createDataSet():
-    dataSet = [[1, 1, 'yes'],
+    dataSet = [[1, 1, 'maybe'],
                [1, 1, 'yes'],
                [1, 0, 'no'],
                [0, 1, 'no'],
@@ -66,8 +66,8 @@ def splitDataSet(dataSet, axis, value):
 
 #测试一下
 myData,myFeatureNames = createDataSet()
-print('=============')
-print(splitDataSet(myData,0,1)) #axis = 0,且这个特征的值=1
+# print('=============')
+# print(splitDataSet(myData,0,1)) #axis = 0,且这个特征的值=1
 
 
 # In[3]:
@@ -85,10 +85,14 @@ def chooseBestFeatureToSplit(dataSet):
         uniqueVal = set(featureList)       #用set去重
         newEntropy = 0.0
         for value in uniqueVal:  
+            print(value,uniqueVal)
             subDataSet = splitDataSet(dataSet, i, value)#对第i个特征，针对某个值划分
+            print(subDataSet)
             prob = len(subDataSet)/float(len(dataSet))
             newEntropy += prob * Entropy(subDataSet)   #累加信息熵  
         infoGain = baseEntropy - newEntropy     #计算这次划分的信息增益
+        print('++++++++')
+        print(newEntropy)
         if (infoGain > bestInfoGain):       
             bestInfoGain = infoGain         #替换好的值
             bestFeature = i
@@ -140,7 +144,7 @@ def createTree(dataSet,featureNames):
     uniqueVals = set(featureValues)
     for value in uniqueVals:
         subNames = featureNames[:]  #copy all of featureName, 为了保留原有的featureName不被函数修改
-        myTree[bestFeatureName][value] =             createTree(splitDataSet(dataSet, bestFeature, value),subNames) #返回的是一个字典
+        myTree[bestFeatureName][value] = createTree(splitDataSet(dataSet, bestFeature, value),subNames) #返回的是一个字典
     return myTree 
 
 
