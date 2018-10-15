@@ -10,8 +10,9 @@ def create_data():
     [0,1,'no'],
     [0,1,'no']])
     features = datasets[:,:-1]
+    featureNames = ['no surfacing','flippers'] #不浮出水面是否存活 ，有无脚蹼
     labels = datasets[:,-1]
-    return datasets,features
+    return datasets,featureNames
 
 def digitalize_Data(datasets):
     datasets[datasets[:,2] == 'yes',2] = 0
@@ -85,6 +86,14 @@ def majorityCnt(classList):
     return max_label
 
 
+
+def createTree(datasets,featureList)
+
+
+
+
+
+
 def test_func():
     '''
     to test the majorityCnt functin
@@ -94,11 +103,17 @@ def test_func():
     print("the majorityClassCount is 0\n",majorityCnt(c))
 
 
+# def createTree(datasets,featureNames):
+#     decTree={}
+#     best_feature = chooseBestFeatureToSplit(datasets)
+#     decTree[featureNames[best_feature]]={}
+
+
 
 
 
 def main():
-    datasets,features = create_data()
+    datasets,featureNames = create_data()
     print(datasets[:,2])
     entropy = Entropy(datasets[:,2])
     print(entropy)
