@@ -11,6 +11,7 @@ def create_data():
     [0,1,'no']])
     features = datasets[:,:-1]
     featureNames = ['no surfacing','flippers'] #不浮出水面是否存活 ，有无脚蹼
+    print('featureNames:',featureNames)
     labels = datasets[:,-1]
     return datasets,featureNames
 
@@ -47,7 +48,7 @@ def splitDataset(datasets,axis,value):
 def chooseBestFeatureToSplit(datasets):
     '''
     this is a description for this function.
-    this fuction is used for choose the best feature
+    this fuction is used to choose the best feature
     for zhe decitionTree
     '''
     best_infoGain = 0.0 
@@ -56,12 +57,9 @@ def chooseBestFeatureToSplit(datasets):
         col_value_data = set(datasets[:,i])
         new_entropy = 0.0
         for value in col_value_data:
-            print(value,col_value_data)
             new_data = datasets[datasets[:,i]==str(value),2]
-            print(new_data)
             prop = len(new_data)/float(len(datasets))
             new_entropy += prop*Entropy(new_data)
-        print('new_entropy',new_entropy)
         info_gain = base_Entropy - new_entropy
         if info_gain > best_infoGain:
             best_infoGain = info_gain
@@ -87,8 +85,28 @@ def majorityCnt(classList):
 
 
 
-def createTree(datasets,featureList)
-
+def createTree(datasets,featureNames):
+    '''
+    1.choose best_feature_name to construct myTree
+    2.drop the best feature and construct new_data 
+    with the left features to replace the original datasets.
+    3.call this function itself to construct next level of myTree
+    4.set the  conditions to get off this function
+        conditon1:only one kind of label left in datasets
+        conditone2:no more features left in datasets
+    '''
+    myTree={}
+    best_feature = chooseBestFeatureToSplit(datasets)
+    best_feature_name = featureNames[best_feature]
+    myTree[best_feature_name] = {}
+    print('this is myTree:')
+    print(myTree)
+    # new_data = datasets[:]
+    new_data = np.delete(datasets,best_feature,axis=1)
+    print('new_data and new_featurenames')
+    print(new_data)
+    featureNames.pop(best_feature)
+    print(featureNames)
 
 
 
@@ -103,29 +121,25 @@ def test_func():
     print("the majorityClassCount is 0\n",majorityCnt(c))
 
 
-# def createTree(datasets,featureNames):
-#     decTree={}
-#     best_feature = chooseBestFeatureToSplit(datasets)
-#     decTree[featureNames[best_feature]]={}
 
-
-
-
+P
 
 def main():
     datasets,featureNames = create_data()
-    print(datasets[:,2])
+    # print(datasets[:,2])
     entropy = Entropy(datasets[:,2])
-    print(entropy)
+    # print(entropy)
     # featureList = [example[0] for example in datasets]
     # print(featureList)
     datasets= digitalize_Data(datasets)
-    print(datasets)
+    # print(datasets)
     data_splited_value = splitDataset(datasets,0,1)
-    print(data_splited_value)
+    # print(data_splited_value)
     best_feature = chooseBestFeatureToSplit(datasets)
     print('best_feature is :',best_feature)
-# main()
+    createTree(datasets,featureNames)
+      
+main()
 
 
 # test_func()
