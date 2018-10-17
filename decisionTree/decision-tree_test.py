@@ -4,7 +4,7 @@ import numpy as np
 
 def create_data():
     datasets=np.array(
-    [[1,1,'maybe'],
+    [[1,1,'yes'],
     [1,1,'yes'],
     [1,0,'no'],
     [0,1,'no'],
@@ -57,7 +57,7 @@ def chooseBestFeatureToSplit(datasets):
         col_value_data = set(datasets[:,i])
         new_entropy = 0.0
         for value in col_value_data:
-            new_data = datasets[datasets[:,i]==str(value),2]
+            new_data = datasets[datasets[:,i]==str(value),-1]
             prop = len(new_data)/float(len(datasets))
             new_entropy += prop*Entropy(new_data)
         info_gain = base_Entropy - new_entropy
@@ -94,22 +94,30 @@ def createTree(datasets,featureNames):
     4.set the  conditions to get off this function
         conditon1:only one kind of label left in datasets
         conditone2:no more features left in datasets
+
     '''
-    myTree={}
+    classList = datasets[:,-1]
+    if len(datasets[0]) == 1:
+        # print('no features provided')
+        return majorityCnt(classList)
+    # print('classList',classList)
+    num = np.sum(classList == classList[0])
+    if num == len(classList): #如果所有的类都一样，第0类的个数==长度
+        return classList[0]
     best_feature = chooseBestFeatureToSplit(datasets)
+    myTree={}
     best_feature_name = featureNames[best_feature]
     myTree[best_feature_name] = {}
-    print('this is myTree:')
-    print(myTree)
-    # new_data = datasets[:]
-    new_data = np.delete(datasets,best_feature,axis=1)
-    print('new_data and new_featurenames')
-    print(new_data)
+    # print('this is myTree:')
+    # print(myTree)
     featureNames.pop(best_feature)
-    print(featureNames)
-
-
-
+    featureValue = datasets[:,best_feature]
+    uniqueValues = set(featureValue)
+    # print(featureNames)
+    for value in uniqueValues:
+        subNames = featureNames[:]
+        myTree[best_feature_name][value] = createTree(splitDataset(datasets, best_feature, value),subNames)
+    return myTree
 
 
 def test_func():
@@ -122,24 +130,53 @@ def test_func():
 
 
 
-P
+
+
+
+
+
+
+
+# 预测函数
+def feature_calssify(tree_dict,featureNames,testVec):
+    if isinstance(tree_dict,dict):
+        for key in tree_dict:
+            if isinstance(tree_dict[key],dict):
+                for value in tree_dict[key]:
+                    if str(testVec[key == featureNames]) == value:
+                        if not isinstance(tree_dict[key][value],dict):
+                            # 非字典结构直接返回结果
+                            return tree_dict[key][value]
+                        else:
+                            tree_dict = tree_dict[key][value]
+                            # 字典结构回调
+                            return feature_calssify(tree_dict,featureNames,testVec)
+            else:
+                # 非字典结构直接返回结果
+                return tree_dict[key]
+            
+
+
+
+
+
+
+
+
+
 
 def main():
     datasets,featureNames = create_data()
-    # print(datasets[:,2])
     entropy = Entropy(datasets[:,2])
-    # print(entropy)
-    # featureList = [example[0] for example in datasets]
-    # print(featureList)
-    datasets= digitalize_Data(datasets)
-    # print(datasets)
     data_splited_value = splitDataset(datasets,0,1)
-    # print(data_splited_value)
     best_feature = chooseBestFeatureToSplit(datasets)
-    print('best_feature is :',best_feature)
-    createTree(datasets,featureNames)
-      
+    myTree = {}
+    myTree = createTree(datasets,featureNames)
+
+    pred=feature_calssify(myTree, featureNames, [1,1])
+    print(pred)
+
+
 main()
 
 
-# test_func()

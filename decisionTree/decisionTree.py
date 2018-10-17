@@ -150,13 +150,21 @@ def createTree(dataSet,featureNames):
 
 
 #测试一下 
+
 myData,myFeatureNames = createDataSet()
+
 myTree = createTree(myData,myFeatureNames)
+print('mytree function test')
 print(myTree)
 print(myFeatureNames)  #最后的list，会被改变(！！！因为函数参数是list,参数是按照引用的方式传递的)
+# {'no surfacing': {0: 'no', 1: {'flippers': {0: 'no', 1: 'maybe'}}}}
+# {'no surfacing': {'0': '1', '1': {'flippers': {'0': '1', '1': '2'}}}}
+# {'no surfacing': {'0': 'no', '1': {'flippers': {'0': 'no', '1': 'maybe'}}}}
+# # In[6]:
 
 
-# In[6]:
+
+
 
 
 #测试算法：对于某个输入变量x，使用决策树，进行分类
@@ -178,6 +186,17 @@ print("[1,0] should be classify as 'no'\n",class0)
 
 class1 = classify(myTree,myFeatureNames,[1,1])
 print("[1,1] should be classify as 'yes'\n",class1)
+
+
+
+
+
+
+
+
+
+
+
 
 
 # In[7]:
