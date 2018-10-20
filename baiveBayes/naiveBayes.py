@@ -32,23 +32,23 @@ def setOfWordsVec(vocabularyList, inputSet):
         if word in vocabularyList:
             returnVec[vocabularyList.index(word)] = 1 #留言中的某个单词在词汇表中，则为1，否则为0
         else:
-            print "the word: %s is not in my Vocabulary!" % word
+            print("the word: %s is not in my Vocabulary!" % word)
     return returnVec
 
 
 #现在测试一下效果
 postingList,classVec = loadDataSet()
 vocabularyList = createVocabularyList(postingList)
-print "the vocabulary list is:\n",vocabularyList
+print("the vocabulary list is:\n",vocabularyList)
 returnVec = setOfWordsVec(vocabularyList,postingList[0])
-print "post0 vector=\n",returnVec
+print("post0 vector=\n",returnVec)
 
 #现在将所有的留言，都转化为0/1词汇表特征向量，作为trainVec
 trainVec = []
 for post in postingList:
     trainVec.append(setOfWordsVec(vocabularyList,post))
 
-print "all post vector are:\n",trainVec
+print("all post vector are:\n",trainVec)
 
 
 # In[2]:
@@ -65,8 +65,10 @@ def NaiveBayes0(trainMatrix,trainCategory):
     p1 = sum(trainCategory)/float(numTrain)  #分类1的概率p(y=1)，这里是二分类，所以，p0=1-p1
     p0Num = np.zeros(numWords); p1Num = np.zeros(numWords)      #初始化为0
     p0Denom = 0.0; p1Denom = 0.0                        
+    print('this is trainMatrix1')
     for i in range(numTrain):
         if trainCategory[i] == 1:
+            print(trainMatrix[i])
             p1Num += trainMatrix[i] #y=1条件下，统计某个单词出现的个数，用于计算p(w/y=1)
             p1Denom += sum(trainMatrix[i]) #累计y=1的所有单词数量
         else:
@@ -76,10 +78,38 @@ def NaiveBayes0(trainMatrix,trainCategory):
     p0Vect = p0Num/float(p0Denom)     #p(w/y=0)  
     return p0Vect,p1Vect,p1
 
+
+
+
+def NaiveBayes(featureMatrix,classMatrix):
+    featureMatrix = np.array(featureMatrix)
+    classMatrix = np.array(classMatrix)
+    line = len(classMatrix)
+    pclass1 = sum(classMatrix[classMatrix == 1])/float(line)
+    class1matrix = featureMatrix[classMatrix == 1]
+    class0matrix = featureMatrix[classMatrix == 0]
+    pclass1_vec = []
+    pclass0_vec = []
+    for i in range(len(class1matrix[0])):
+        pclass1_vec.append(sum(class1matrix[:,i]))
+    for j in range(len(class0matrix[0])):
+        pclass0_vec.append(sum(class0matrix[:,j]))
+    under1 = sum(pclass1_vec)
+    pclass1_vec = [x/float(under1) for x in pclass1_vec]
+    under0 = sum(pclass0_vec)
+    pclass0_vec = [x/float(under0) for x in pclass0_vec]
+    return pclass0_vec,pclass1_vec,pclass1
+
+
 #测试一下
-p0Vect,p1Vect,p1 = NaiveBayes0(trainVec,classVec)
-print "p(y=1) = ",p1  #classVec = [0,1,0,1,0,1] ,so p1=0.5
-print "y=1,the word with the max Probability=(%f), is(%s)"      %(np.max(p1Vect),vocabularyList[np.argmax(p1Vect)])
+p0Vect,p1Vect,p1 = NaiveBayes(trainVec,classVec)
+print('=======')
+print(p0Vect)
+print(p1Vect)
+print(p1)
+print('======')
+print("p(y=1) = ",p1 ) #classVec = [0,1,0,1,0,1] ,so p1=0.5
+print("y=1,the word with the max Probability=(%f), is(%s)"      %(np.max(p1Vect),vocabularyList[np.argmax(p1Vect)]))
 
 
 # In[3]:
@@ -129,76 +159,76 @@ def classify(testVec, p0Vec, p1Vec, pClass1):
 p0V,p1V,p1 = NaiveBayes1(trainVec,classVec)
 test0 = ['love', 'my', 'dalmation']
 testVec0 = setOfWordsVec(vocabularyList, test0)
-print test0,'classified as: ',classify(testVec0,p0V,p1V,p1)
+print(test0,'classified as: ',classify(testVec0,p0V,p1V,p1))
 test1 = ['stupid', 'garbage']
 testVec1 = setOfWordsVec(vocabularyList, test1)
-print test1,'classified as: ',classify(testVec1,p0V,p1V,p1)
+print(test1,'classified as: ',classify(testVec1,p0V,p1V,p1))
 
 
 # In[5]:
 
 
-#下面我们将贝叶斯模型用于垃圾邮件分类
+# #下面我们将贝叶斯模型用于垃圾邮件分类
 
 
-#词袋模型，需要统计某个token出现的次数
-def bagOfWordsVec(vocabularyList, inputSet):
-    returnVec = [0]*len(vocabularyList)
-    for word in inputSet:
-        if word in vocabularyList:
-            returnVec[vocabularyList.index(word)] += 1 #出现一次，累加一次
-    return returnVec
+# #词袋模型，需要统计某个token出现的次数
+# def bagOfWordsVec(vocabularyList, inputSet):
+#     returnVec = [0]*len(vocabularyList)
+#     for word in inputSet:
+#         if word in vocabularyList:
+#             returnVec[vocabularyList.index(word)] += 1 #出现一次，累加一次
+#     return returnVec
 
 
-# In[6]:
+# # In[6]:
 
 
-import re
-#文档处理，
-def textParse(bigString):    #input is big string, #output is word list
-    listOfTokens = re.split(r'\W*', bigString) #只需要字符和数字
-    return [tok.lower() for tok in listOfTokens if len(tok) > 2] #变成小写，过滤长度小于3的字符串 
+# import re
+# #文档处理，
+# def textParse(bigString):    #input is big string, #output is word list
+#     listOfTokens = re.split(r'\W*', bigString) #只需要字符和数字
+#     return [tok.lower() for tok in listOfTokens if len(tok) > 2] #变成小写，过滤长度小于3的字符串 
     
-def spamTest():
-    docList=[]; classList = []; fullText =[]
-    for i in range(1,26): #每个文件夹，有25个文件
-        wordList = textParse(open('bayes/email/spam/%d.txt' % i).read())
-        docList.append(wordList)
-        fullText.extend(wordList)
-        classList.append(1)
-        wordList = textParse(open('bayes/email/ham/%d.txt' % i).read())
-        docList.append(wordList)
-        fullText.extend(wordList)
-        classList.append(0)
-    vocabularyList = createVocabularyList(docList)#create vocabulary
-    trainingSet = range(50); testSet=[]   #create test set,这里其实是val set，而且只保存了下标
-    for i in range(10):
-        randIndex = int(np.random.uniform(0,len(trainingSet)))
-        testSet.append(trainingSet[randIndex])
-        del(trainingSet[randIndex])  #随机选取10个，并且从train中删除
-    trainMat=[]; trainClasses = []
-    for docIndex in trainingSet:#train the classifier (get probs) trainNB0
-        trainMat.append(bagOfWordsVec(vocabularyList, docList[docIndex]))
-        trainClasses.append(classList[docIndex])
-    p0V,p1V,pSpam = NaiveBayes1(trainMat,trainClasses) #学习得到的train的概率
-    errorCount = 0
-    for docIndex in testSet:        #classify the remaining items
-        wordVector = bagOfWordsVec(vocabularyList, docList[docIndex])
-        if classify(wordVector,p0V,p1V,pSpam) != classList[docIndex]: #用于test/val
-            errorCount += 1
-            print "classification error",docList[docIndex]
-    print 'the error rate is: ',float(errorCount)/len(testSet)
+# def spamTest():
+#     docList=[]; classList = []; fullText =[]
+#     for i in range(1,26): #每个文件夹，有25个文件
+#         wordList = textParse(open('bayes/email/spam/%d.txt' % i).read())
+#         docList.append(wordList)
+#         fullText.extend(wordList)
+#         classList.append(1)
+#         wordList = textParse(open('bayes/email/ham/%d.txt' % i).read())
+#         docList.append(wordList)
+#         fullText.extend(wordList)
+#         classList.append(0)
+#     vocabularyList = createVocabularyList(docList)#create vocabulary
+#     trainingSet = range(50); testSet=[]   #create test set,这里其实是val set，而且只保存了下标
+#     for i in range(10):
+#         randIndex = int(np.random.uniform(0,len(trainingSet)))
+#         testSet.append(trainingSet[randIndex])
+#         del(trainingSet[randIndex])  #随机选取10个，并且从train中删除
+#     trainMat=[]; trainClasses = []
+#     for docIndex in trainingSet:#train the classifier (get probs) trainNB0
+#         trainMat.append(bagOfWordsVec(vocabularyList, docList[docIndex]))
+#         trainClasses.append(classList[docIndex])
+#     p0V,p1V,pSpam = NaiveBayes1(trainMat,trainClasses) #学习得到的train的概率
+#     errorCount = 0
+#     for docIndex in testSet:        #classify the remaining items
+#         wordVector = bagOfWordsVec(vocabularyList, docList[docIndex])
+#         if classify(wordVector,p0V,p1V,pSpam) != classList[docIndex]: #用于test/val
+#             errorCount += 1
+#             print "classification error",docList[docIndex]
+#     print 'the error rate is: ',float(errorCount)/len(testSet)
 
 
-# In[7]:
+# # In[7]:
 
 
-#因为是随机选取10个留存作为val set,所以，error rate 会变化
-spamTest()
+# #因为是随机选取10个留存作为val set,所以，error rate 会变化
+# spamTest()
 
 
-# In[8]:
+# # In[8]:
 
 
-spamTest()
+# spamTest()
 
