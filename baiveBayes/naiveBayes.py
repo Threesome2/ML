@@ -80,7 +80,7 @@ def NaiveBayes0(trainMatrix,trainCategory):
 
 
 
-
+#this is function by jackson,ugly but work well
 def NaiveBayes(featureMatrix,classMatrix):
     featureMatrix = np.array(featureMatrix)
     classMatrix = np.array(classMatrix)
