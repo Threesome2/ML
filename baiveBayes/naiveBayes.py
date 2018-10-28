@@ -145,7 +145,7 @@ def classify(testVec, p0Vec, p1Vec, pClass1):
     p1 = sum(testVec * p1Vec) + np.log(pClass1)    #因为是log,所以这里是求和以及+号操作
     #p(y=1/w) = p(w/y=1) * p(y=1),注意这里需要乘上，testVec,过滤掉那些为0的特征的概率
     p0 = sum(testVec * p0Vec) + np.log(1.0 - pClass1) #p(y=0) = 1 - p(y=1)
-    if p1 > p0: #选取最大的概率的类
+    if p1 > p0: #选取最大的概率的类  
         return 1
     else: 
         return 0
